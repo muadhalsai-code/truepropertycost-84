@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "pricing": "Pricing",
+    "signIn": "Sign In",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "title": "Stop Paying 'Surprise Fees' on UAE Property",
+    "subtitle": "Know Every Dirham Before You Buy",
+    "description": "For property buyers, investors, agents, and advisors who need precise cost transparency, True Property Cost Calculator predicts ALL costs (DLD fees, service charges, taxes) in 60 seconds – delivering professional-grade accuracy.",
+    "cta": "Start Your Cost Analysis →",
+    "secondary": "Learn More",
+    "features": {
+      "uncoverFees": {
+        "title": "Uncover Every Fee",
+        "description": "AI scans contracts to flag \"invisible\" costs like DEWA deposits or Ajman leasehold traps."
+      },
+      "avoidGaps": {
+        "title": "Avoid Valuation Gaps", 
+        "description": "See if banks will undervalue your off-plan purchase BEFORE you commit."
+      },
+      "inheritanceProof": {
+        "title": "Inheritance-Proof Ownership",
+        "description": "Smart contracts ensure your family keeps the property – no legal loopholes."
+      }
+    }
+  },
+  "pain": {
+    "title": "Hidden Costs Are Eating Your Profits",
+    "subtitle": "UAE property transactions involve 37+ different fees that can add up to 15% of your property value",
+    "realityCheck": "Reality Check: The average property buyer in Dubai discovers an additional 47,000 AED in unexpected costs during the transaction process.",
+    "points": {
+      "fees": {
+        "quote": "I had no idea about all the hidden fees until it was too late",
+        "impact": "Hidden transaction costs averaging 47,000 AED per property"
+      },
+      "complexity": {
+        "quote": "The paperwork was overwhelming and confusing",
+        "impact": "78% of buyers miss critical cost details in contracts"
+      },
+      "timing": {
+        "quote": "Unexpected delays cost me thousands in additional fees",
+        "impact": "Delays add 15-25% to total transaction costs"
+      }
+    }
+  },
+  "outcome": {
+    "title": "What You Get",
+    "subtitle": "Comprehensive property cost analysis"
+  },
+  "product": {
+    "title": "How It Works",
+    "subtitle": "Simple, fast, accurate"
+  },
+  "trustBadges": {
+    "compliance": "UAE Central Bank Compliant",
+    "certified": "ISO 27001 Certified", 
+    "customers": "4,200+ Happy Customers",
+    "gdpr": "GDPR Compliant"
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Transparent pricing for every need",
+    "free": {
+      "title": "Free",
+      "price": "0",
+      "description": "Perfect for occasional calculations",
+      "features": [
+        "2 calculations per day",
+        "Basic cost breakdown",
+        "Email support"
+      ]
+    },
+    "premium": {
+      "title": "Premium",
+      "price": "29",
+      "description": "For professionals and frequent users",
+      "features": [
+        "Unlimited calculations",
+        "Detailed PDF reports",
+        "Custom fee adjustments",
+        "Priority support",
+        "Advanced analytics"
+      ]
+    }
+  },
+  "calculator": {
+    "title": "True Property Cost Calculator",
+    "subtitle": "UAE Real Estate Transaction Cost Calculator",
+    "description": "Calculate accurate property transaction costs in the UAE",
+    "propertyValue": "Property Value (AED)",
+    "propertyType": "Property Type",
+    "location": "Location",
+    "buyerType": "Buyer Type",
+    "calculate": "Calculate Costs",
+    "clear": "Clear",
+    "results": "Cost Breakdown",
+    "totalCosts": "Total Transaction Costs",
+    "downloadReport": "Download PDF Report",
+    "upgrade": "Upgrade to Premium",
+    "propertyTypes": {
+      "apartment": "Apartment",
+      "villa": "Villa",
+      "townhouse": "Townhouse",
+      "commercial": "Commercial"
+    },
+    "locations": {
+      "dubai": "Dubai",
+      "abuDhabi": "Abu Dhabi",
+      "sharjah": "Sharjah",
+      "other": "Other Emirates"
+    },
+    "buyerTypes": {
+      "uaeNational": "UAE National",
+      "gccNational": "GCC National", 
+      "expat": "Expat/Foreigner"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "calculator": "Cost Calculator",
+    "analytics": "Property Analytics",
+    "reports": "Reports",
+    "settings": "Settings",
+    "upgradePrompt": {
+      "title": "Daily Limit Reached",
+      "description": "You've used all 2 free calculations for today.",
+      "upgradeTitle": "Upgrade to Premium",
+      "features": [
+        "Unlimited daily calculations",
+        "Custom commission/NOC adjustments", 
+        "Downloadable PDF reports",
+        "Priority support"
+      ],
+      "maybeLater": "Maybe Later",
+      "upgradeNow": "Upgrade Now"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close"
+  }
+}
