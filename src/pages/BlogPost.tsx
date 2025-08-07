@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, User, ArrowLeft } from 'lucide-react';
 import Navigation from '@/components/Navigation';
+import { sanitizeHtml } from '@/utils/sanitization';
 
 const BlogPostContent = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -125,7 +126,7 @@ const BlogPostContent = () => {
                      prose-li:text-foreground
                      prose-blockquote:text-muted-foreground
                      prose-blockquote:border-l-primary"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </article>
 

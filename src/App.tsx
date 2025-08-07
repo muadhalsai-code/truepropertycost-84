@@ -13,6 +13,7 @@ import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
+import SecurityHeaders from "./components/SecurityHeaders";
 import { logBrowserInfo } from "./utils/browserDetection";
 
 const queryClient = new QueryClient({
@@ -35,6 +36,7 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <SecurityHeaders />
         <Toaster />
         <Sonner />
         <BrowserRouter>

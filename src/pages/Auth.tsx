@@ -9,8 +9,11 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from 'react-i18next';
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { validatePassword, validateEmail, sanitizeTextInput } from "@/utils/sanitization";
+import { authRateLimiter } from "@/utils/rateLimiting";
+import { securityLogger } from "@/utils/securityLogger";
 
 const Auth = () => {
   const { t } = useTranslation();
@@ -26,6 +29,13 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  
+  // Password validation state
+  const [passwordValidation, setPasswordValidation] = useState({
+    isValid: false,
+    errors: [] as string[],
+    strength: 'weak' as 'weak' | 'medium' | 'strong'
+  });
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -59,21 +69,66 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate and sanitize inputs
+    const sanitizedEmail = sanitizeTextInput(loginEmail);
+    if (!validateEmail(sanitizedEmail)) {
+      securityLogger.logValidationFailure('email', loginEmail, 'Invalid email format');
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check rate limiting
+    const rateLimitCheck = authRateLimiter.isRateLimited(sanitizedEmail);
+    if (rateLimitCheck.isBlocked) {
+      securityLogger.logRateLimitEvent(sanitizedEmail, 'login', true);
+      toast({
+        title: "Too Many Attempts",
+        description: `Please wait ${Math.ceil((rateLimitCheck.remainingTime || 0) / 60)} minutes before trying again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
+        email: sanitizedEmail,
         password: loginPassword,
       });
 
       if (error) {
+        // Record failed attempt
+        const blockResult = authRateLimiter.recordFailedAttempt(sanitizedEmail);
+        securityLogger.logAuthEvent('login_failed', sanitizedEmail, false, { 
+          error: error.message,
+          blocked: blockResult.isNowBlocked 
+        });
+        
+        let description = error.message;
+        if (blockResult.isNowBlocked) {
+          description += ` Account temporarily blocked for ${Math.ceil((blockResult.remainingTime || 0) / 60)} minutes due to repeated failed attempts.`;
+        } else {
+          const remaining = authRateLimiter.getRemainingAttempts(sanitizedEmail);
+          if (remaining <= 2) {
+            description += ` ${remaining} attempts remaining before temporary block.`;
+          }
+        }
+        
         toast({
           title: "Login Failed",
-          description: error.message,
+          description,
           variant: "destructive",
         });
       } else {
+        // Record successful attempt
+        authRateLimiter.recordSuccessfulAttempt(sanitizedEmail);
+        securityLogger.logAuthEvent('login_success', sanitizedEmail, true);
         toast({
           title: "Success",
           description: "Successfully logged in!",
@@ -94,19 +149,33 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (signupPassword !== confirmPassword) {
+    // Validate and sanitize email
+    const sanitizedEmail = sanitizeTextInput(signupEmail);
+    if (!validateEmail(sanitizedEmail)) {
+      securityLogger.logValidationFailure('email', signupEmail, 'Invalid email format');
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match.",
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
         variant: "destructive",
       });
       return;
     }
-
-    if (signupPassword.length < 6) {
+    
+    // Enhanced password validation
+    const validation = validatePassword(signupPassword);
+    if (!validation.isValid) {
       toast({
-        title: "Weak Password",
-        description: "Password must be at least 6 characters long.",
+        title: "Password Requirements Not Met",
+        description: validation.errors.join('. '),
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (signupPassword !== confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match.",
         variant: "destructive",
       });
       return;
@@ -118,7 +187,7 @@ const Auth = () => {
       const redirectUrl = `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
+        email: sanitizedEmail,
         password: signupPassword,
         options: {
           emailRedirectTo: redirectUrl
@@ -126,6 +195,7 @@ const Auth = () => {
       });
 
       if (error) {
+        securityLogger.logAuthEvent('signup_failed', sanitizedEmail, false, { error: error.message });
         if (error.message.includes("already registered")) {
           toast({
             title: "Account Exists",
@@ -140,6 +210,7 @@ const Auth = () => {
           });
         }
       } else {
+        securityLogger.logAuthEvent('signup_success', sanitizedEmail, true);
         toast({
           title: "Success",
           description: "Account created successfully! You now have free premium access with unlimited calculations. Please check your email for verification.",
@@ -265,7 +336,15 @@ const Auth = () => {
                           type={showPassword ? "text" : "password"}
                           placeholder="Create a password"
                           value={signupPassword}
-                          onChange={(e) => setSignupPassword(e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setSignupPassword(value);
+                            if (value) {
+                              setPasswordValidation(validatePassword(value));
+                            } else {
+                              setPasswordValidation({ isValid: false, errors: [], strength: 'weak' });
+                            }
+                          }}
                           required
                         />
                         <Button
@@ -282,6 +361,52 @@ const Auth = () => {
                           )}
                         </Button>
                       </div>
+                      
+                      {/* Password Strength Indicator */}
+                      {signupPassword && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-300 ${
+                                  passwordValidation.strength === 'strong' 
+                                    ? 'w-full bg-green-500' 
+                                    : passwordValidation.strength === 'medium'
+                                    ? 'w-2/3 bg-yellow-500'
+                                    : 'w-1/3 bg-red-500'
+                                }`}
+                              />
+                            </div>
+                            <span className={`text-xs font-medium ${
+                              passwordValidation.strength === 'strong' 
+                                ? 'text-green-600' 
+                                : passwordValidation.strength === 'medium'
+                                ? 'text-yellow-600'
+                                : 'text-red-600'
+                            }`}>
+                              {passwordValidation.strength.charAt(0).toUpperCase() + passwordValidation.strength.slice(1)}
+                            </span>
+                          </div>
+                          
+                          {passwordValidation.errors.length > 0 && (
+                            <div className="space-y-1">
+                              {passwordValidation.errors.map((error, index) => (
+                                <div key={index} className="flex items-center gap-2 text-xs text-red-600">
+                                  <AlertTriangle className="w-3 h-3" />
+                                  <span>{error}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {passwordValidation.isValid && (
+                            <div className="flex items-center gap-2 text-xs text-green-600">
+                              <CheckCircle className="w-3 h-3" />
+                              <span>Password meets all requirements</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirm-password">Confirm Password</Label>

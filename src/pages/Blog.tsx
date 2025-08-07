@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, User, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
+import { sanitizeHtml } from '@/utils/sanitization';
 
 const BlogContent = () => {
   const { loading, error, data, fetchMore } = useWordPressPosts(6);
@@ -109,7 +110,7 @@ const BlogContent = () => {
               <CardContent>
                 <div 
                   className="text-muted-foreground mb-4 line-clamp-3"
-                  dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.excerpt) }}
                 />
                 
                 <Link to={`/blog/${post.slug}`}>
