@@ -63,15 +63,8 @@ export const useUserProfile = () => {
   const getUsageLimit = () => {
     if (!profile) return 0;
     
-    switch (profile.subscription_tier) {
-      case 'free':
-        return 2;
-      case 'premium':
-      case 'professional':
-        return Infinity;
-      default:
-        return 0;
-    }
+    // Everyone gets premium access now
+    return Infinity;
   };
 
   return {
@@ -80,6 +73,6 @@ export const useUserProfile = () => {
     loading,
     isAuthenticated: !!user,
     usageLimit: getUsageLimit(),
-    isPremium: profile?.subscription_tier !== 'free'
+    isPremium: true // Everyone gets premium access now
   };
 };

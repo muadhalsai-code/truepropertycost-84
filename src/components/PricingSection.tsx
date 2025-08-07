@@ -26,35 +26,8 @@ const PricingSection = () => {
     }));
   };
 
-  const startPremiumTrial = async () => {
-    if (!user) {
-      window.location.href = '/auth';
-      return;
-    }
-
-    try {
-      // Create a premium trial by updating the user profile
-      const { error } = await supabase.rpc('start_premium_trial', {
-        target_user_id: user.id
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Premium Trial Started!",
-        description: "You now have 30 days of free premium access. Enjoy unlimited calculations!",
-      });
-
-      // Redirect to dashboard
-      window.location.href = '/dashboard';
-    } catch (error) {
-      console.error('Error starting premium trial:', error);
-      toast({
-        title: "Error",
-        description: "Unable to start premium trial. Please try again or contact support.",
-        variant: "destructive",
-      });
-    }
+  const redirectToAuth = () => {
+    window.location.href = '/auth';
   };
   const plans = [{
     id: "starter",
@@ -75,15 +48,15 @@ const PricingSection = () => {
   }, {
     id: "premium",
     name: "Premium",
-    subtitle: "Free for everyone - Limited time offer!",
+    subtitle: "Automatically included for all users!",
     price: "FREE",
     period: "",
-    savings: "🎉 Limited time: Completely free!",
+    savings: "🎉 Free premium access for everyone!",
     icon: Crown,
-    badge: "FREE - Limited Time",
+    badge: "Always FREE",
     badgeColor: "bg-green-500 text-white",
     features: ["Unlimited calculations", "Custom commission/NOC adjustments", "Downloadable PDF reports", "Priority support", "No ads", "All premium features included"],
-    cta: "Get Free Premium Access →",
+    cta: "Sign Up & Start Using →",
     ctaVariant: "default" as const,
     popular: true,
     borderColor: "border-green-500",
@@ -206,11 +179,11 @@ const PricingSection = () => {
                                className={`w-full ${plan.highlight ? 'bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white' : ''}`} 
                                variant={plan.ctaVariant}
                                disabled={plan.comingSoon}
-                            onClick={() => {
-                              if (plan.id === 'starter' || plan.id === 'premium') {
-                                window.location.href = '/auth';
-                              }
-                            }}
+                             onClick={() => {
+                               if (plan.id === 'starter' || plan.id === 'premium') {
+                                 redirectToAuth();
+                               }
+                             }}
                              >
                                {plan.cta}
                              </Button>
@@ -222,13 +195,11 @@ const PricingSection = () => {
                            className={`w-full ${plan.highlight ? 'bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white' : ''}`} 
                            variant={plan.ctaVariant}
                            disabled={plan.comingSoon}
-                            onClick={() => {
-                              if (plan.id === 'starter') {
-                                window.location.href = '/auth';
-                              } else if (plan.id === 'premium') {
-                                startPremiumTrial();
-                              }
-                            }}
+                             onClick={() => {
+                               if (plan.id === 'starter' || plan.id === 'premium') {
+                                 redirectToAuth();
+                               }
+                             }}
                          >
                            {plan.cta}
                          </Button>}

@@ -8,6 +8,7 @@ export const UsageIndicator = () => {
   const { todayUsage, usageLimit, remainingCalculations } = useUsageTracking();
   const { profile, isPremium } = useUserProfile();
 
+  // Everyone has premium now, so no usage indicator needed
   if (!profile || isPremium) return null;
 
   const usagePercentage = (todayUsage / usageLimit) * 100;
